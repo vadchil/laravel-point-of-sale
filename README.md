@@ -385,7 +385,7 @@ This project is open-sourced software licensed under the [MIT license](https://o
 
 ## 👥 Authors
 
-- **Your Name** - *Initial work*
+- **Satria Fadhil Muhammad** - *Initial work*
 
 ## 🙏 Acknowledgments
 
@@ -397,7 +397,7 @@ This project is open-sourced software licensed under the [MIT license](https://o
 
 ## 📞 Support
 
-For support, email support@toko-rizqi.com or open an issue in the repository.
+For support, email college.satriafm@gmail.com or open an issue in the repository.
 
 ---
 
