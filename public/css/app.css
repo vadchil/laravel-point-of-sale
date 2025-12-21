@@ -1,0 +1,14 @@
+.bg-hero {
+    background-image: url('/images/hero_bg.svg');
+    /* Properti lain seperti size dsb */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.bg-hero-img {
+    background-image: url('/images/hero_img_bg.png');
+    /* Properti lain seperti size dsb */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
