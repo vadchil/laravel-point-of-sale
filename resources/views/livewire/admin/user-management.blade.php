@@ -46,6 +46,18 @@
                         :error="$errors->first('password')"
                     />
                 @endif
+
+                <x-select
+                    wire:model="role"
+                    label="Role"
+                    required
+                    :error="$errors->first('role')"
+                >
+                    <option value="">Pilih Role</option>
+                    @foreach($roles as $roleOption)
+                        <option value="{{ $roleOption->name }}">{{ ucfirst($roleOption->name) }}</option>
+                    @endforeach
+                </x-select>
             </div>
 
             <div class="flex gap-2">
@@ -97,6 +109,7 @@
                     <x-table.head>
                         <x-table.header>Nama</x-table.header>
                         <x-table.header>Email</x-table.header>
+                        <x-table.header>Role</x-table.header>
                         <x-table.header class="text-right">Aksi</x-table.header>
                     </x-table.head>
                     <x-table.body>
@@ -104,6 +117,18 @@
                             <x-table.row>
                                 <x-table.cell class="font-medium">{{ $user->name }}</x-table.cell>
                                 <x-table.cell>{{ $user->email }}</x-table.cell>
+                                <x-table.cell>
+                                    @if($user->roles->count() > 0)
+                                        @foreach($user->roles as $role)
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                                {{ $role->name === 'admin' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' }}">
+                                                {{ ucfirst($role->name) }}
+                                            </span>
+                                        @endforeach
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500 text-sm">Tidak ada role</span>
+                                    @endif
+                                </x-table.cell>
                                 <x-table.cell class="text-right">
                                     <div class="flex items-center justify-end gap-2">
                                         <x-button

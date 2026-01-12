@@ -58,6 +58,14 @@
             >
                 {{ __('Input Penjualan') }}
             </flux:navlist.item>
+            <flux:navlist.item
+                icon="clock"
+                :href="route('karyawan.riwayat')"
+                :current="request()->routeIs('karyawan.riwayat')"
+                wire:navigate
+            >
+                {{ __('Riwayat Penjualan') }}
+            </flux:navlist.item>
         @endrole
 
     </flux:navlist.group>

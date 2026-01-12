@@ -16,6 +16,8 @@ class RiwayatPenjualan extends Component
 
     public $lastSql = null;   // debug SQL
     public $salesCount = 0;   // debug jumlah hasil
+    
+    public $selectedPenjualan = null; // untuk modal detail
 
     protected $queryString = [
         'tanggalAwal'  => ['except' => ''],
@@ -39,6 +41,16 @@ class RiwayatPenjualan extends Component
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    public function showDetail($penjualanId)
+    {
+        $this->selectedPenjualan = Penjualan::with(['user', 'penjualanProduk.produk'])->find($penjualanId);
+    }
+
+    public function closeDetail()
+    {
+        $this->selectedPenjualan = null;
     }
 
     public function deleteByDateRange()
@@ -101,13 +113,20 @@ class RiwayatPenjualan extends Component
                 [$start, $end] = [$end, $start];
             }
 
-            // Gunakan whereBetween pada timestamp (startOfDay/endOfDay) => paling tahan untuk date/datetime
-            $query = Penjualan::with('produk')
+            // Query per transaksi (bukan per produk)
+            // Load relasi user dan produk untuk efisiensi
+            $query = Penjualan::with(['user', 'penjualanProduk.produk'])
                 ->whereBetween('tanggal', [$start->toDateTimeString(), $end->toDateTimeString()]);
 
+            // Search berdasarkan nama produk atau nama user
             if (!empty($this->search)) {
-                $query->whereHas('produk', function ($q) {
-                    $q->where('namaproduk', 'like', '%' . $this->search . '%');
+                $query->where(function($q) {
+                    $q->whereHas('penjualanProduk.produk', function ($subQ) {
+                        $subQ->where('namaproduk', 'like', '%' . $this->search . '%');
+                    })->orWhereHas('user', function ($subQ) {
+                        $subQ->where('name', 'like', '%' . $this->search . '%')
+                             ->orWhere('email', 'like', '%' . $this->search . '%');
+                    });
                 });
             }
 

@@ -11,8 +11,16 @@ class UserManagement extends Component
 {
     public $users;
     public $name, $email, $password, $user_id;
+    public $role = 'karyawan'; // default role
     public $isEdit = false;
     public $search = ''; // ditambahkan karena ada wire:model="search" di view
+    public $roles; // untuk menyimpan daftar roles
+
+    public function mount()
+    {
+        // Load semua roles yang tersedia
+        $this->roles = Role::all();
+    }
 
     public function render()
     {
@@ -45,9 +53,8 @@ class UserManagement extends Component
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
+            'role' => 'required|exists:roles,name',
         ]);
-
-        $role = Role::firstOrCreate(['name' => 'karyawan']);
 
         $user = User::create([
             'name' => $this->name,
@@ -55,12 +62,11 @@ class UserManagement extends Component
             'password' => Hash::make($this->password),
         ]);
 
-        if (method_exists($user, 'assignRole')) {
-            $user->assignRole($role);
-        }
+        // Assign role ke user
+        $user->assignRole($this->role);
 
         $this->resetInput();
-        session()->flash('success', 'User berhasil ditambahkan.');
+        session()->flash('success', 'User berhasil ditambahkan dengan role ' . $this->role . '.');
     }
 
     public function edit($id)
@@ -69,6 +75,8 @@ class UserManagement extends Component
         $this->user_id = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
+        // Set role dari user (ambil role pertama jika ada)
+        $this->role = $user->roles->first()?->name ?? 'karyawan';
         $this->isEdit = true;
     }
 
@@ -77,6 +85,7 @@ class UserManagement extends Component
         $this->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $this->user_id,
+            'role' => 'required|exists:roles,name',
         ]);
 
         $user = User::find($this->user_id);
@@ -85,8 +94,11 @@ class UserManagement extends Component
             'email' => $this->email,
         ]);
 
+        // Update role user (hapus semua role lalu assign role baru)
+        $user->syncRoles([$this->role]);
+
         $this->resetInput();
-        session()->flash('success', 'User berhasil diperbarui.');
+        session()->flash('success', 'User berhasil diperbarui dengan role ' . $this->role . '.');
     }
 
     public function delete($id)
@@ -101,6 +113,7 @@ class UserManagement extends Component
         $this->name = '';
         $this->email = '';
         $this->password = '';
+        $this->role = 'karyawan';
         $this->user_id = null;
         $this->isEdit = false;
     }

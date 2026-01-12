@@ -8,6 +8,7 @@ use App\Livewire\AdminDashboard;
 use App\Livewire\KaryawanDashboard;
 use App\Livewire\Dashboard;
 use App\Livewire\Karyawan\InputPenjualan;
+use App\Livewire\Karyawan\RiwayatPenjualan as KaryawanRiwayatPenjualan;
 use App\Livewire\Admin\ManajemenBarang;
 use App\Livewire\Admin\RiwayatPenjualan;
 use App\Livewire\Admin\UserManagement;
@@ -29,6 +30,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
 Route::middleware(['auth', 'role:karyawan'])->group(function () {
     Route::get('karyawan/penjualan', InputPenjualan::class)->name('karyawan.penjualan');
+    Route::get('karyawan/riwayat', KaryawanRiwayatPenjualan::class)->name('karyawan.riwayat');
 });
 
 Route::middleware(['auth'])->group(function () {

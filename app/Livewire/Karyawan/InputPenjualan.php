@@ -109,10 +109,11 @@ class InputPenjualan extends Component
     DB::beginTransaction();
 
     try {
-        // Buat entri penjualan
+        // Buat entri penjualan dengan user_id
         $penjualan = Penjualan::create([
             'tanggal'     => now(),
             'total_harga' => $this->totalHarga,
+            'user_id'     => auth()->id(),
         ]);
 
         // Simpan tiap item ke tabel penjualan_produk lewat model PenjualanProduk

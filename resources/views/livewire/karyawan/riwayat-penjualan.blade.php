@@ -1,19 +1,8 @@
 <div>
-    <x-card title="Riwayat Penjualan" subtitle="Lihat dan kelola riwayat transaksi">
-        {{-- Flash Messages --}}
-        @if (session()->has('message'))
-            <x-alert 
-                type="{{ str_contains(session('message'), 'Berhasil') || str_contains(session('message'), 'berhasil') ? 'success' : 'info' }}" 
-                class="mb-6" 
-                dismissible
-            >
-                {{ session('message') }}
-            </x-alert>
-        @endif
-
-        {{-- Filter & Search --}}
+    <x-card title="Riwayat Penjualan Saya" subtitle="Lihat riwayat transaksi penjualan Anda">
+        {{-- Filter Tanggal --}}
         <div class="mb-6 space-y-4">
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         Dari Tanggal
@@ -33,26 +22,6 @@
                         wire:model.lazy="tanggalAkhir" 
                         class="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                     >
-                </div>
-                <div class="sm:col-span-2 lg:col-span-1">
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Cari
-                    </label>
-                    <x-search-input 
-                        placeholder="Cari produk atau user..." 
-                        wire:model.debounce.500ms="search"
-                    />
-                </div>
-                <div class="flex items-end">
-                    <x-button
-                        variant="danger"
-                        wire:click="deleteByDateRange"
-                        wire:confirm="Apakah Anda yakin ingin menghapus riwayat dalam rentang tanggal ini? Tindakan ini tidak dapat dibatalkan."
-                        wire:loading.attr="disabled"
-                    >
-                        <span wire:loading.remove wire:target="deleteByDateRange">Hapus Riwayat</span>
-                        <span wire:loading wire:target="deleteByDateRange">Menghapus...</span>
-                    </x-button>
                 </div>
             </div>
         </div>
@@ -78,7 +47,6 @@
             <x-table>
                 <x-table.head>
                     <x-table.header>Tanggal & Waktu</x-table.header>
-                    <x-table.header>User</x-table.header>
                     <x-table.header>Jumlah Produk</x-table.header>
                     <x-table.header class="text-right">Total Harga</x-table.header>
                     <x-table.header class="text-right">Aksi</x-table.header>
@@ -95,16 +63,6 @@
                                         {{ \Carbon\Carbon::parse($penjualan->tanggal)->format('H:i:s') }}
                                     </div>
                                 </div>
-                            </x-table.cell>
-                            <x-table.cell>
-                                @if($penjualan->user)
-                                    <div class="text-sm">
-                                        <div class="font-medium">{{ $penjualan->user->name }}</div>
-                                        <div class="text-gray-500 dark:text-gray-400 text-xs">{{ $penjualan->user->email }}</div>
-                                    </div>
-                                @else
-                                    <span class="text-gray-400 dark:text-gray-500 text-sm">-</span>
-                                @endif
                             </x-table.cell>
                             <x-table.cell>
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
@@ -127,6 +85,18 @@
                     @endforeach
                 </x-table.body>
             </x-table>
+
+            {{-- Summary --}}
+            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Total Transaksi: <span class="font-semibold">{{ $sales->count() }}</span>
+                    </span>
+                    <span class="text-lg font-bold text-blue-600 dark:text-blue-400">
+                        Total: Rp {{ number_format($sales->sum('total_harga'), 0, ',', '.') }}
+                    </span>
+                </div>
+            </div>
         @endif
 
         {{-- Modal Detail Transaksi --}}
@@ -187,14 +157,6 @@
                                         {{ \Carbon\Carbon::parse($selectedPenjualan->tanggal)->format('d M Y H:i:s') }}
                                     </span>
                                 </div>
-                                @if($selectedPenjualan->user)
-                                    <div class="flex justify-between">
-                                        <span class="text-gray-600 dark:text-gray-400">User:</span>
-                                        <span class="font-medium text-gray-900 dark:text-white">
-                                            {{ $selectedPenjualan->user->name }} ({{ $selectedPenjualan->user->email }})
-                                        </span>
-                                    </div>
-                                @endif
                                 <div class="flex justify-between">
                                     <span class="text-gray-600 dark:text-gray-400">Total Harga:</span>
                                     <span class="font-semibold text-lg text-gray-900 dark:text-white">
